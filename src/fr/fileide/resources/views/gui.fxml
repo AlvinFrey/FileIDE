@@ -11,7 +11,7 @@
       <menus>
         <Menu mnemonicParsing="false" text="Fichier">
           <items>
-            <MenuItem fx:id="newButton" mnemonicParsing="false" text="Nouveau" />
+              <MenuItem fx:id="newButton" mnemonicParsing="false" onAction="#newFile" text="Nouveau"/>
             <MenuItem fx:id="openButton" mnemonicParsing="false" text="Ouvrir..." />
             <Menu fx:id="recentButton" mnemonicParsing="false" text="Fichiers récents" />
             <SeparatorMenuItem mnemonicParsing="false" />
@@ -50,7 +50,7 @@
           <content>
             <AnchorPane id="Content" minHeight="-1.0" minWidth="-1.0" prefHeight="548.0" prefWidth="669.0">
                      <children>
-                       <TabPane fx:id="tabPane" prefHeight="551.0" prefWidth="670.0" tabClosingPolicy="ALL_TABS"/>
+                         <TabPane fx:id="tabPane" prefHeight="551.0" prefWidth="670.0" tabClosingPolicy="ALL_TABS"/>
                      </children>
             </AnchorPane>
           </content>

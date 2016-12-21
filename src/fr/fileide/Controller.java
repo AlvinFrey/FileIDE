@@ -1,5 +1,6 @@
 package fr.fileide;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,12 +14,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable{
 
-    Image folderIcon = new Image("fr/fileide/folder.png");
-    Image fileIcon = new Image("fr/fileide/file.png");
+    Image folderIcon = new Image("fr/fileide/resources/icons/folder.png");
+    Image fileIcon = new Image("fr/fileide/resources/icons/file.png");
 
     @FXML
     private TreeView<String> treeView;
@@ -37,7 +39,7 @@ public class Controller implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        messageLabel.setText("Bonjour ici Albert Reporter ! ");
+        messageLabel.setText("FileIDE");
         File currentDir = new File(fileDirectory);
         findFiles(currentDir, null);
 
@@ -62,19 +64,7 @@ public class Controller implements Initializable{
 
                         path = "src/fr/" + path;
 
-                        String fileContent = null;
-                        try {
-                            fileContent = new String(Files.readAllBytes(Paths.get(path)));
-                            final Tab tab = new Tab(selectedItem.getValue());
-                            tabPane.getTabs().add(tab);
-                            tabPane.getSelectionModel().select(tab);
-                            TextArea textArea = new TextArea();
-                            tab.setContent(textArea);
-                            textArea.setText(fileContent);
-                            textArea.requestFocus();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        openFile(selectedItem, path);
 
                     } else {
 
@@ -86,6 +76,35 @@ public class Controller implements Initializable{
 
             }
         });
+
+    }
+
+    public void openFile(TreeItem<String> selectedItem, String path) {
+
+        try {
+
+            final String fileContent = new String(Files.readAllBytes(Paths.get(path)));
+
+            final Tab tab = new Tab(selectedItem.getValue());
+            tabPane.getTabs().add(tab);
+            tabPane.getSelectionModel().select(tab);
+            TextArea textArea = new TextArea();
+            tab.setContent(textArea);
+            textArea.setText(fileContent);
+            textArea.requestFocus();
+
+            messageLabel.setText("Vous venez d'ouvrir le fichier : " + selectedItem.getValue());
+
+            textArea.textProperty().addListener((observable, oldValue, newValue) -> {
+
+                tab.setText(selectedItem.getValue() + "*");
+                tab.setStyle("-fx-background-color: #ef5350;");
+
+            });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -113,6 +132,29 @@ public class Controller implements Initializable{
         } else {
             parent.getChildren().add(root);
             root.setGraphic(new ImageView((Image) folderIcon));
+        }
+
+    }
+
+    public void newFile(ActionEvent actionEvent) {
+
+        TextInputDialog dialog = new TextInputDialog("untitled");
+        dialog.setTitle("Nom du fichier");
+        dialog.setHeaderText("Veuillez choisir un nom pour votre nouveau fichier");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+
+            final Tab tab = new Tab(result.get() + "*");
+            tab.setStyle("-fx-background-color: #ef5350;");
+            tabPane.getTabs().add(tab);
+            tabPane.getSelectionModel().select(tab);
+            TextArea textArea = new TextArea();
+            tab.setContent(textArea);
+            textArea.requestFocus();
+
+            messageLabel.setText("Vous venez d'ouvrir un nouveau fichier nommé : " + result.get());
+
         }
 
     }

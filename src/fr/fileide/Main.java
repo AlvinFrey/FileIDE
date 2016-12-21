@@ -16,7 +16,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("resources/views/gui.fxml"));
-        primaryStage.getIcons().add(new Image("fr/fileide/icon.png"));
+        primaryStage.getIcons().add(new Image("fr/fileide/resources/icons/icon.png"));
         primaryStage.setTitle("FileIDE");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
