@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.DirectoryChooser;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,43 +40,74 @@ public class Controller implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        messageLabel.setText("FileIDE");
-        File currentDir = new File(fileDirectory);
-        findFiles(currentDir, null);
+        treeView.setShowRoot(false);
 
-        treeView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Sélectionnez le dossier contenant votre projet");
+        File defaultDirectory = new File(fileDirectory);
+        chooser.setInitialDirectory(defaultDirectory);
+        File selectedDirectory = chooser.showDialog(null);
 
-                if (event.getClickCount() == 2) {
+        if (selectedDirectory.isDirectory() == true) {
 
-                    TreeItem<String> selectedItem = treeView.getSelectionModel().getSelectedItem();
 
-                    if (selectedItem.getChildren().isEmpty()) {
+            messageLabel.setText("FileIDE");
+            findFiles(selectedDirectory, null);
 
-                        StringBuilder pathBuilder = new StringBuilder();
-                        for (TreeItem<String> item = treeView.getSelectionModel().getSelectedItem();
-                             item != null; item = item.getParent()) {
+            treeView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
 
-                            pathBuilder.insert(0, item.getValue());
-                            pathBuilder.insert(0, "/");
+                    if (event.getClickCount() == 2) {
+
+                        TreeItem<String> selectedItem = treeView.getSelectionModel().getSelectedItem();
+
+                        if (selectedItem.getChildren().isEmpty()) {
+
+                            String folder = selectedDirectory.getName();
+                            String parent = selectedItem.getParent().getValue();
+
+                            if (parent.equals(folder)) {
+
+                                String path = selectedDirectory.getAbsolutePath() + "\\" + selectedItem.getValue();
+                                openFile(selectedItem, path);
+
+                            } else {
+
+                                StringBuilder pathBuilder = new StringBuilder();
+                                for (TreeItem<String> item = treeView.getSelectionModel().getSelectedItem(); item != null; item = item.getParent()) {
+
+                                    System.out.println(item);
+
+                                    if (!item.getValue().equals(folder)) {
+
+                                        pathBuilder.insert(0, item.getValue());
+                                        pathBuilder.insert(0, "\\");
+
+
+                                    }
+
+                                }
+                                String path = pathBuilder.toString();
+
+                                path = selectedDirectory + path;
+
+                                openFile(selectedItem, path);
+
+                            }
+
                         }
-                        String path = pathBuilder.toString();
-
-                        path = "src/fr/" + path;
-
-                        openFile(selectedItem, path);
-
-                    } else {
-
-                        System.out.println("EN PRINCIPE, c'est un dossier donc balek");
 
                     }
 
                 }
+            });
 
-            }
-        });
+        }
+
+        System.out.println(selectedDirectory.getAbsolutePath());
+        System.out.println(selectedDirectory.isDirectory());
+        System.out.println(selectedDirectory);
 
     }
 
